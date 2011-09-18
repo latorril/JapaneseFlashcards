@@ -6,6 +6,7 @@ import java.util.Random;
 
 import android.app.Activity;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.view.LayoutInflater;
@@ -51,6 +52,9 @@ public class JapaneseFlashcardsActivity extends Activity{
 	private String[] lorem = {"lorem", "ipsum", "dolor",
 			"sit", "amet","consectetuer", "adipiscing", "elit", "morbi",
 			};
+	private long rowId;
+	private FlashcardDb db;
+	private Cursor flashcardCursor;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,14 +73,34 @@ public class JapaneseFlashcardsActivity extends Activity{
         listGroup = (LinearLayout) findViewById(R.id.listGroup);
         listItemName = (TextView) findViewById(R.id.listItemName);
         myInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        
+
 		randomNumber = getRandomNumber();
 		questionSet = selectQuestionSet(randomNumber);
 		
 		questionInput = (EditText) findViewById(R.id.questionInput);
-		setQuestion();
-				
+		
+		this.db = new FlashcardDb(this);
+		db.open();
+		rowId = 0;
+		
+		//db.createFlashcard("FOO", "BAR");
+		//db.deleteAllFlashcards();
+		setQuestion();		
 		inflateFromArray();
+		
+		nextButton.setOnClickListener(new View.OnClickListener() {
+			//set to get a question and answer from db columns upon clicking
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				flashcardCursor = db.fetchFlashcard(rowId);
+				//gets random card from array;
+				/*randomNumber = getRandomNumber();
+				questionSet = selectQuestionSet(randomNumber);
+				setQuestion();*/
+			}
+			
+		});
 		
 		inflateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -98,7 +122,6 @@ public class JapaneseFlashcardsActivity extends Activity{
 			}
         	
         });
-        
         viewQuestion.setOnClickListener(new View.OnClickListener() {
         	
         	@Override
@@ -107,18 +130,6 @@ public class JapaneseFlashcardsActivity extends Activity{
         		flipCard();
         		
         	}
-        	
-        });
-        
-        nextButton.setOnClickListener(new View.OnClickListener() {
-        	//set to get a question and answer from db columns upon clicking
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				randomNumber = getRandomNumber();
-				questionSet = selectQuestionSet(randomNumber);
-				setQuestion();
-			}
         	
         });
         
@@ -177,7 +188,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 		listGroup.addView(listItem);
     }
     
-    //will get rid of this
+    //will modify this and create a list that inflates from the database entries
 	public void inflateFromArray(){
 		for(String item: lorem){
 			LinearLayout listItem = (LinearLayout) 
