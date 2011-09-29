@@ -35,10 +35,11 @@ public final class R {
         public static final int card=0x7f070006;
         public static final int closeDrawerButton=0x7f07000c;
         public static final int content=0x7f07000b;
+        public static final int flashcardListText=0x7f070012;
         public static final int handle=0x7f07000a;
         public static final int inflateButton=0x7f070011;
         public static final int listButton=0x7f070003;
-        public static final int listGroup=0x7f070012;
+        public static final int listGroup=0x7f070013;
         public static final int listItemName=0x7f070002;
         public static final int nextButton=0x7f070005;
         public static final int question=0x7f070007;
