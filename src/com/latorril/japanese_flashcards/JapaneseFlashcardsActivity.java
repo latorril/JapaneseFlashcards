@@ -1,15 +1,12 @@
 package com.latorril.japanese_flashcards;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
-import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -28,7 +25,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 	FlashcardDb db;
 	long id;
 	
-	TextView 
+	AutoResizeTextView 
 		viewAnswer,
 		viewQuestion;
 	View 
@@ -56,10 +53,6 @@ public class JapaneseFlashcardsActivity extends Activity{
 	
 	ArrayList<Integer> idList;
 	
-	private String[] lorem = {"lorem", "ipsum", "dolor",
-			"sit", "amet","consectetuer", "adipiscing", "elit", "morbi",
-			};
-	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,24 +60,22 @@ public class JapaneseFlashcardsActivity extends Activity{
         
         db = new FlashcardDb(this);
         
-        flipperLayout = (View)findViewById(R.id.card);
+        flipperLayout     = (View)findViewById(R.id.card);
         
-        viewAnswer = (TextView)findViewById(R.id.answer);
-        viewQuestion = (TextView)findViewById(R.id.question);
-        nextButton = (Button)findViewById(R.id.nextButton);
-        slidingDrawer = (SlidingDrawer)findViewById(R.id.slidingDrawer);
-        quiz = (View)findViewById(R.id.quiz);
+        viewAnswer        = (AutoResizeTextView)findViewById(R.id.answer);
+        viewQuestion      = (AutoResizeTextView)findViewById(R.id.question);
+        nextButton        = (Button)findViewById(R.id.nextButton);
+        slidingDrawer     = (SlidingDrawer)findViewById(R.id.slidingDrawer);
+        quiz              = (View)findViewById(R.id.quiz);
         closeDrawerButton = (Button)findViewById(R.id.closeDrawerButton);
         
-        inflateButton = (Button)findViewById(R.id.inflateButton);
-        listGroup = (LinearLayout) findViewById(R.id.listGroup);
-        listItemName = (TextView) findViewById(R.id.listItemName);
-        myInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-		//randomNumber = getRandomNumber();
+        inflateButton     = (Button)findViewById(R.id.inflateButton);
+        listGroup         = (LinearLayout) findViewById(R.id.listGroup);
+        listItemName      = (TextView) findViewById(R.id.listItemName);
+        myInflater        = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		
-		questionInput = (EditText) findViewById(R.id.questionInput);
-		answerInput = (EditText) findViewById(R.id.answerInput);
+		questionInput     = (EditText) findViewById(R.id.questionInput);
+		answerInput       = (EditText) findViewById(R.id.answerInput);
 
 		inflateFromDb();
 		

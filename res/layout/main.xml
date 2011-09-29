@@ -30,21 +30,21 @@
 		    android:layout_height="fill_parent"
 			android:layout_weight="1"
 			>
-			<TextView
+			<com.latorril.japanese_flashcards.AutoResizeTextView
 				android:id="@+id/question"
 			    android:layout_width="fill_parent" 
 			    android:layout_height="fill_parent"
 			    android:gravity="center"
-			    android:textSize="20dip"
+			    android:textSize="100dip"
 			    android:text="@string/question"
 			    android:background="@color/slate_gray"
 			    />
-			<TextView 
+			<com.latorril.japanese_flashcards.AutoResizeTextView 
 				android:id="@+id/answer"
 			    android:layout_width="fill_parent" 
 			    android:layout_height="fill_parent"
 			    android:gravity="center"
-			    android:textSize="20dip"
+			    android:textSize="100dip"
 			    android:text="@string/answer"
 			    android:background="@color/dark_gray"
 			    />
