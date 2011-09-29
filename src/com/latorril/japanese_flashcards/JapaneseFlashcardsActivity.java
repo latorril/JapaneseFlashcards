@@ -46,12 +46,12 @@ public class JapaneseFlashcardsActivity extends Activity{
 	int randomNumber;
 	String[]questionSet;
 	
-	static int pos = 0;
-	static int i = 0;
 	LayoutInflater myInflater;
 	LinearLayout listGroup;
 	TextView listItemName;
-	EditText questionInput;
+	EditText 
+		questionInput,
+		answerInput;
 	
 	private String[] lorem = {"lorem", "ipsum", "dolor",
 			"sit", "amet","consectetuer", "adipiscing", "elit", "morbi",
@@ -101,6 +101,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 		questionSet = selectQuestionSet(randomNumber);
 		
 		questionInput = (EditText) findViewById(R.id.questionInput);
+		answerInput = (EditText) findViewById(R.id.answerInput);
 
 		setQuestion();		
 		//inflateFromArray();
@@ -126,7 +127,8 @@ public class JapaneseFlashcardsActivity extends Activity{
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 	            imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
 	            
-	    		if(questionInput.getText().length() > 0)
+	    		if((questionInput.getText().length() > 0) && 
+	    				(answerInput.getText().length() > 0))
 	            {
 	            	inflateFromInput();
 	            }
@@ -208,7 +210,9 @@ public class JapaneseFlashcardsActivity extends Activity{
             	myInflater.inflate(R.layout.list_option, null);
             	//set pos to _id in database
             	listItem.setId(c.getInt(0));
-            	((TextView) listItem.getChildAt(0)).setText(c.getString(1)  + " - ");
+            	((TextView) listItem.getChildAt(0)).setText(
+            			c.getString(1)  + " - " + c.getString(2)
+            			);
             	final Button delete;
             	delete = (Button)listItem.getChildAt(1);
             	delete.setOnClickListener(new View.OnClickListener() {
@@ -235,17 +239,22 @@ public class JapaneseFlashcardsActivity extends Activity{
     public void inflateFromInput(){
 
 		final LinearLayout listItem = (LinearLayout) 
-			myInflater.inflate(R.layout.list_option, null);
+		myInflater.inflate(R.layout.list_option, null);
+		
 		String questionString = questionInput.getText().toString();
+		String answerString   = answerInput.getText().toString();
 		//userInput will also go to the database and be put into the "question" column
 		//also create if statements so that fields must have a value
 		db.open();
-		long id = db.createFlashcard(questionString, "SOMETHING");
-		listItem.setId((int) id);
+		long id = db.createFlashcard(questionString, answerString);
+		listItem.setId((int)id);
 		db.close();
 		
 		questionInput.setText(null);
-		((TextView) listItem.getChildAt(0)).setText(questionString + " - ");
+		answerInput.setText(null);
+		((TextView) listItem.getChildAt(0)).setText(
+				questionString + " - " + answerString
+				);
 		final Button delete;
 	    delete = (Button)listItem.getChildAt(1);
 	    delete.setOnClickListener(new View.OnClickListener() {
@@ -261,36 +270,8 @@ public class JapaneseFlashcardsActivity extends Activity{
 				deleteParent.setVisibility(View.GONE);
 			}
 		});
-		pos++;
 		listGroup.addView(listItem);
     }
-
-    //will modify this and create a list that inflates from the database entries
-	public void inflateFromArray(){
-        
-		for(String item: lorem){
-			LinearLayout listItem = (LinearLayout) 
-				myInflater.inflate(R.layout.list_option, null);
-			//set pos to _id in database
-			listItem.setId(pos);
-			((TextView) listItem.getChildAt(0)).setText(item);
-			final Button delete;
-		    delete = (Button)listItem.getChildAt(1);
-		    delete.setOnClickListener(new View.OnClickListener() {
-				
-				@Override
-				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					//here we will also send query to delete row where _id = listItem.getId() 
-					LinearLayout deleteParent = (LinearLayout) v.getParent();
-					deleteParent.setVisibility(View.GONE);
-				}
-			});
-		    
-		    pos++;
-			listGroup.addView(listItem);
-		};
-	}
     
 	public void flipCard(){
 		FlipAnimator animator = new FlipAnimator(viewQuestion, viewAnswer,
