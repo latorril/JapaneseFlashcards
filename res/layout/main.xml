@@ -89,32 +89,51 @@
 					android:layout_margin="10dip"
 					>
 					<Button 
+					    android:id="@+id/closeDrawerButton"
 					    android:layout_width="fill_parent" 
 						android:layout_height="wrap_content"
-					    android:id="@+id/closeDrawerButton"
 					    android:text="@string/close_drawer_text"
 					    />
+					<TextView
+						android:id="@+id/questionText"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="QUESTION"
+						android:layout_below="@id/closeDrawerButton"
+						/>
 					<EditText
 						android:id="@+id/questionInput"
 						android:layout_width="fill_parent"
 						android:layout_height="wrap_content"
-						android:layout_below="@id/closeDrawerButton"
-						android:layout_toLeftOf="@+id/inflateButton"
+						android:layout_below="@id/questionText"
+						/>
+					<TextView
+						android:id="@+id/answerText"
+						android:layout_width="wrap_content"
+						android:layout_height="wrap_content"
+						android:text="ANSWER"
+						android:layout_below="@id/questionInput"
+						/>
+					<EditText
+						android:id="@+id/answerInput"
+						android:layout_width="fill_parent"
+						android:layout_height="wrap_content"
+						android:layout_below="@id/answerText"
 						/>
 					<Button 
-					    android:id="@id/inflateButton"
+					    android:id="@+id/inflateButton"
 					    android:layout_width="wrap_content" 
 						android:layout_height="wrap_content"
 						android:text="Inflate"
 						android:layout_alignParentRight="true"
-						android:layout_alignBaseline="@id/questionInput"
+						android:layout_below="@id/answerInput"
 					    />
 					<LinearLayout
 						android:id="@+id/listGroup"
 						android:layout_width="fill_parent"
 						android:layout_height="wrap_content"
 						android:orientation="vertical"
-						android:layout_below="@id/questionInput"
+						android:layout_below="@id/inflateButton"
 						/>
 				</RelativeLayout>
 			</LinearLayout>

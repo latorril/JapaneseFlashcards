@@ -17,12 +17,16 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.SlidingDrawer.OnDrawerCloseListener;
 import android.widget.SlidingDrawer.OnDrawerOpenListener;
 
 public class JapaneseFlashcardsActivity extends Activity{
     /** Called when the activity is first created. */
 	//ViewFlipper viewFlipper;
+	FlashcardDb db;
+	long id;
+	
 	TextView 
 		viewAnswer,
 		viewQuestion;
@@ -52,14 +56,33 @@ public class JapaneseFlashcardsActivity extends Activity{
 	private String[] lorem = {"lorem", "ipsum", "dolor",
 			"sit", "amet","consectetuer", "adipiscing", "elit", "morbi",
 			};
-	private long rowId;
-	private FlashcardDb db;
-	private Cursor flashcardCursor;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
+        
+        db = new FlashcardDb(this);
+      //---add 2 titles---
+        db.open();        
+        
+        /*Cursor c = db.fetchAllFlashcards();
+        if (c.moveToFirst())
+        {
+            do {          
+                DisplayTitle(c);
+            } while (c.moveToNext());
+        }*/
+        // 12 entries so far
+        /*id = db.createFlashcard(
+        		"foo_1",
+        		"bar_1");        
+        id = db.createFlashcard(
+        		"foo_2",
+        		"bar_2"
+        		);*/
+        db.close();
+        
         flipperLayout = (View)findViewById(R.id.card);
         
         viewAnswer = (TextView)findViewById(R.id.answer);
@@ -78,26 +101,20 @@ public class JapaneseFlashcardsActivity extends Activity{
 		questionSet = selectQuestionSet(randomNumber);
 		
 		questionInput = (EditText) findViewById(R.id.questionInput);
-		
-		this.db = new FlashcardDb(this);
-		db.open();
-		rowId = 0;
-		
-		//db.createFlashcard("FOO", "BAR");
-		//db.deleteAllFlashcards();
+
 		setQuestion();		
-		inflateFromArray();
+		//inflateFromArray();
+		inflateFromDb();
 		
 		nextButton.setOnClickListener(new View.OnClickListener() {
 			//set to get a question and answer from db columns upon clicking
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				flashcardCursor = db.fetchFlashcard(rowId);
 				//gets random card from array;
-				/*randomNumber = getRandomNumber();
+				randomNumber = getRandomNumber();
 				questionSet = selectQuestionSet(randomNumber);
-				setQuestion();*/
+				setQuestion();
 			}
 			
 		});
@@ -108,8 +125,13 @@ public class JapaneseFlashcardsActivity extends Activity{
 				// TODO Auto-generated method stub
 				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 	            imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-				inflateFromInput();
-				
+	            
+	    		if(questionInput.getText().length() > 0)
+	            {
+	            	inflateFromInput();
+	            }
+	            
+	            else{}
 			}
 		});
 		
@@ -148,6 +170,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 			@Override
 			public void onDrawerClosed() {
 				// TODO Auto-generated method stub
+				
 			}
 		});
         closeDrawerButton.setOnClickListener(new View.OnClickListener() {
@@ -155,6 +178,8 @@ public class JapaneseFlashcardsActivity extends Activity{
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
+				InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+	            imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
 				quiz.setVisibility(View.VISIBLE);
 				slidingDrawer.animateClose();
 				
@@ -162,16 +187,65 @@ public class JapaneseFlashcardsActivity extends Activity{
 		});
     }
     
+    public void DisplayTitle(Cursor c)
+    {
+        Toast.makeText(this,        		
+        		"id: "       + c.getString(0) + "\n" +
+                "question: " + c.getString(1) + "\n" +
+                "answer: "   + c.getString(2) + "\n",
+                Toast.LENGTH_SHORT).show();        
+    }
+    
+    public void inflateFromDb()
+    {
+    	db.open();
+        Cursor c = db.fetchAllFlashcards();
+        if (c.moveToFirst())
+        {
+            do {          
+                
+            	final LinearLayout listItem = (LinearLayout) 
+            	myInflater.inflate(R.layout.list_option, null);
+            	//set pos to _id in database
+            	listItem.setId(c.getInt(0));
+            	((TextView) listItem.getChildAt(0)).setText(c.getString(1)  + " - ");
+            	final Button delete;
+            	delete = (Button)listItem.getChildAt(1);
+            	delete.setOnClickListener(new View.OnClickListener() {
+            		
+            		@Override
+            		public void onClick(View v) {
+            			// TODO Auto-generated method stub
+            			//here we will also send query to delete row where _id = listItem.getId() 
+            			db.open();
+            			db.deleteFlashcard(listItem.getId());
+            			db.close();
+            			LinearLayout deleteParent = (LinearLayout) v.getParent();
+            			deleteParent.setVisibility(View.GONE);
+            		}
+            	});
+            	listGroup.addView(listItem);
+            	
+            } while (c.moveToNext());
+        }
+        db.close();
+        
+    }
+    
     public void inflateFromInput(){
 
-		LinearLayout listItem = (LinearLayout) 
+		final LinearLayout listItem = (LinearLayout) 
 			myInflater.inflate(R.layout.list_option, null);
-		listItem.setId(pos);
-		Editable userInput = questionInput.getText();
+		String questionString = questionInput.getText().toString();
 		//userInput will also go to the database and be put into the "question" column
 		//also create if statements so that fields must have a value
+		db.open();
+		long id = db.createFlashcard(questionString, "SOMETHING");
+		listItem.setId((int) id);
+		db.close();
+		
 		questionInput.setText(null);
-		((TextView) listItem.getChildAt(0)).setText(userInput);
+		((TextView) listItem.getChildAt(0)).setText(questionString + " - ");
 		final Button delete;
 	    delete = (Button)listItem.getChildAt(1);
 	    delete.setOnClickListener(new View.OnClickListener() {
@@ -180,6 +254,9 @@ public class JapaneseFlashcardsActivity extends Activity{
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				//here we will also send query to delete row where _id = listItem.getId() 
+				db.open();
+    			db.deleteFlashcard(listItem.getId());
+    			db.close();
 				LinearLayout deleteParent = (LinearLayout) v.getParent();
 				deleteParent.setVisibility(View.GONE);
 			}
@@ -187,9 +264,10 @@ public class JapaneseFlashcardsActivity extends Activity{
 		pos++;
 		listGroup.addView(listItem);
     }
-    
+
     //will modify this and create a list that inflates from the database entries
 	public void inflateFromArray(){
+        
 		for(String item: lorem){
 			LinearLayout listItem = (LinearLayout) 
 				myInflater.inflate(R.layout.list_option, null);
