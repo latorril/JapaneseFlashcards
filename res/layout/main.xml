@@ -35,7 +35,7 @@
 			    android:layout_width="fill_parent" 
 			    android:layout_height="fill_parent"
 			    android:gravity="center"
-			    android:textSize="125dip"
+			    android:textSize="20dip"
 			    android:text="@string/question"
 			    android:background="@color/slate_gray"
 			    />
@@ -44,7 +44,7 @@
 			    android:layout_width="fill_parent" 
 			    android:layout_height="fill_parent"
 			    android:gravity="center"
-			    android:textSize="100dip"
+			    android:textSize="20dip"
 			    android:text="@string/answer"
 			    android:background="@color/dark_gray"
 			    />

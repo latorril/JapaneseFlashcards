@@ -15,10 +15,12 @@ public final class R {
     public static final class attr {
     }
     public static final class color {
+        public static final int black=0x7f050002;
         public static final int dark_gray=0x7f050001;
-        public static final int drawer_text_color=0x7f050003;
+        public static final int drawer_text_color=0x7f050005;
         public static final int slate_gray=0x7f050000;
-        public static final int sliding_drawer_background=0x7f050002;
+        public static final int sliding_drawer_background=0x7f050004;
+        public static final int white=0x7f050003;
     }
     public static final class drawable {
         public static final int black_tab=0x7f020000;

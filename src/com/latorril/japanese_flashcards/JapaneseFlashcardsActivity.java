@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import android.R.integer;
 import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
@@ -53,6 +54,8 @@ public class JapaneseFlashcardsActivity extends Activity{
 		questionInput,
 		answerInput;
 	
+	ArrayList<Integer> idList;
+	
 	private String[] lorem = {"lorem", "ipsum", "dolor",
 			"sit", "amet","consectetuer", "adipiscing", "elit", "morbi",
 			};
@@ -63,25 +66,6 @@ public class JapaneseFlashcardsActivity extends Activity{
         setContentView(R.layout.main);
         
         db = new FlashcardDb(this);
-      //---add 2 titles---
-        db.open();        
-        
-        /*Cursor c = db.fetchAllFlashcards();
-        if (c.moveToFirst())
-        {
-            do {          
-                DisplayTitle(c);
-            } while (c.moveToNext());
-        }*/
-        // 12 entries so far
-        /*id = db.createFlashcard(
-        		"foo_1",
-        		"bar_1");        
-        id = db.createFlashcard(
-        		"foo_2",
-        		"bar_2"
-        		);*/
-        db.close();
         
         flipperLayout = (View)findViewById(R.id.card);
         
@@ -97,25 +81,36 @@ public class JapaneseFlashcardsActivity extends Activity{
         listItemName = (TextView) findViewById(R.id.listItemName);
         myInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-		randomNumber = getRandomNumber();
-		questionSet = selectQuestionSet(randomNumber);
+		//randomNumber = getRandomNumber();
 		
 		questionInput = (EditText) findViewById(R.id.questionInput);
 		answerInput = (EditText) findViewById(R.id.answerInput);
 
-		setQuestion();		
-		//inflateFromArray();
 		inflateFromDb();
 		
+		showFirstCard();
+		
+        
 		nextButton.setOnClickListener(new View.OnClickListener() {
 			//set to get a question and answer from db columns upon clicking
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				//gets random card from array;
-				randomNumber = getRandomNumber();
-				questionSet = selectQuestionSet(randomNumber);
-				setQuestion();
+				idList = getRowIdlist();
+				if(idList.size() > 0){
+					randomNumber = getRandomNumber(idList.size());
+					db.open();
+					Cursor c = db.fetchFlashcard(idList.get(randomNumber));
+					if (c.moveToFirst())
+					{
+						setQuestion(c.getString(1), c.getString(2));
+					}
+					db.close();
+				}
+				else{
+					alertNoCards();
+				}
 			}
 			
 		});
@@ -189,6 +184,31 @@ public class JapaneseFlashcardsActivity extends Activity{
 		});
     }
     
+    public ArrayList<Integer> getRowIdlist()
+    {
+    	ArrayList<Integer> rowIdList = new ArrayList<Integer>();
+    	db.open();
+    	Cursor c = db.fetchAllFlashcards();
+    	if (c.moveToFirst())
+        {
+    		do{
+    			rowIdList.add(new Integer(c.getInt(0)));
+    		}
+    		while(c.moveToNext());
+        }
+    	db.close();
+		return rowIdList;
+    }
+    
+    public void alertNoCards()
+    {
+    	setQuestion("?", "!");
+    }
+    public void setQuestion(String question, String answer){
+		viewQuestion.setText(question);
+		viewAnswer.setText(answer);
+    }
+    
     public void DisplayTitle(Cursor c)
     {
         Toast.makeText(this,        		
@@ -196,6 +216,20 @@ public class JapaneseFlashcardsActivity extends Activity{
                 "question: " + c.getString(1) + "\n" +
                 "answer: "   + c.getString(2) + "\n",
                 Toast.LENGTH_SHORT).show();        
+    }
+    
+    public void showFirstCard()
+    {
+        db.open();
+        Cursor c = db.fetchAllFlashcards();
+        if (c.moveToFirst())
+        {
+        	setQuestion(c.getString(1), c.getString(2));
+        }
+		else{
+			alertNoCards();
+		}
+        db.close();
     }
     
     public void inflateFromDb()
@@ -282,105 +316,12 @@ public class JapaneseFlashcardsActivity extends Activity{
 		flipperLayout.startAnimation(animator);
 	}
 	
-	private int getRandomNumber(){
+	private int getRandomNumber(int maxSize){
 		Random random = new Random();
 		int min = 0;
-		int max = 14;
+		int max = maxSize-1;
 		int randomNumber = random.nextInt(max-min+1) + min;
 		return randomNumber;
-	}
-	
-	public void arrayTest(){
-		String shout = "test";
-		String[] s1 = { shout, "two"};
-		String[] s2 = { "four", "five"};
-		 
-		List<String[]> list = new ArrayList<String[]>();
-		list.add(s1);
-		list.add(s2);
-		String[][] arrays = new String[list.size()][];
-		list.toArray(arrays);
-		String[] something = list.get(0);
-		String test = something[0];
-		viewQuestion.setText(test);
-	}
-	
-	public String[] selectQuestionSet(int number){
-		String[] set = new String[2];
-		
-		switch(number){
-		case 0:
-			set[0] = "あ";
-			set[1] = "A";
-			return set;
-		case 1:
-			set[0] = "い";
-			set[1] = "I";
-			return set;
-		case 2:
-			set[0] = "う";
-			set[1] = "U";
-			return set;
-		case 3:
-			set[0] = "え";
-			set[1] = "E";
-			return set;
-		case 4:
-			set[0] = "お";
-			set[1] = "O";
-			return set;
-		//KA
-		case 5:
-			set[0] = "か";
-			set[1] = "KA";
-			return set;
-		case 6:
-			set[0] = "き";
-			set[1] = "KI";
-			return set;
-		case 7:
-			set[0] = "く";
-			set[1] = "KU";
-			return set;
-		case 8:
-			set[0] = "け";
-			set[1] = "KE";
-			return set;
-		case 9:
-			set[0] = "こ";
-			set[1] = "KO";
-			return set;
-		//SA
-		case 10:
-			set[0] = "さ";
-			set[1] = "SA";
-			return set;
-		case 11:
-			set[0] = "し";
-			set[1] = "SHI";
-			return set;
-		case 12:
-			set[0] = "す";
-			set[1] = "SU";
-			return set;
-		case 13:
-			set[0] = "せ";
-			set[1] = "SE";
-			return set;
-		case 14:
-			set[0] = "そ";
-			set[1] = "SO";
-			return set;
-		}
-		
-		return null;
-	}
-	
-	public void setQuestion(){
-		question = questionSet[0];
-		answer = questionSet[1];
-		viewQuestion.setText(question);
-		viewAnswer.setText(answer);
 	}
     
 }
