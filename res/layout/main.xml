@@ -107,6 +107,7 @@
 						android:layout_width="fill_parent"
 						android:layout_height="wrap_content"
 						android:layout_below="@id/questionText"
+						android:imeOptions="actionNext"
 						/>
 					<TextView
 						android:id="@+id/answerText"
@@ -120,6 +121,7 @@
 						android:layout_width="fill_parent"
 						android:layout_height="wrap_content"
 						android:layout_below="@id/answerText"
+						android:imeOptions="actionDone"
 						/>
 					<Button 
 					    android:id="@+id/inflateButton"

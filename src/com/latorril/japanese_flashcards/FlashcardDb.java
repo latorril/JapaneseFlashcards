@@ -52,7 +52,7 @@ public class FlashcardDb {
             Log.w(TAG, "Upgrading database from version " + oldVersion 
             		+ " to "
                     + newVersion + ", which will destroy all old data");
-            db.execSQL("DROP TABLE IF EXISTS notes");
+            db.execSQL("DROP TABLE IF EXISTS flashcards");
             onCreate(db);
         }
     }
