@@ -123,4 +123,16 @@ public class FlashcardDb {
         return mCursor;
 
     }
+    public Cursor fetchRandomFlashcard() throws SQLException {
+
+        Cursor mCursor =
+            db.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
+                    KEY_QUESTION, KEY_ANSWER}, null, null,
+                    "RANDOM()", null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return mCursor;
+
+    }
 }
