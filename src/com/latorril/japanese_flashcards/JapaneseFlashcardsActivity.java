@@ -68,8 +68,6 @@ public class JapaneseFlashcardsActivity extends Activity{
         listItemName      = (TextView) findViewById(R.id.listItemName);
         myInflater        = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-        //creates the list in the flash card manager panel
-		inflateFromDb();
 		//shows first card in database
 		showFirstCard();
         
@@ -116,6 +114,8 @@ public class JapaneseFlashcardsActivity extends Activity{
             public void onDrawerOpened() {
             	// TODO Auto-generated method stub
             	quiz.setVisibility(View.INVISIBLE);
+                //generates flashcard list
+        		inflateFromDb();
             }
         });
         
@@ -124,6 +124,8 @@ public class JapaneseFlashcardsActivity extends Activity{
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				closeIME(v);
+				//minimizes the flashcard list
+				listGroup.removeViewsInLayout(0, listGroup.getChildCount());
 				quiz.setVisibility(View.VISIBLE);
 				slidingDrawer.animateClose();
 			}
