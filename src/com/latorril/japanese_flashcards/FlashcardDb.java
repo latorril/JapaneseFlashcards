@@ -21,7 +21,6 @@ public class FlashcardDb {
     private static final String DATABASE_CREATE =
     	"create table flashcards (_id integer primary key autoincrement, "
     	+ "question text, answer text);";
-    //add "not null" again later
     
     private final Context context; 
     private DatabaseHelper DBHelper;
@@ -83,21 +82,12 @@ public class FlashcardDb {
         return db.insert(DATABASE_TABLE, null, initialValues);
     }
     
-    //offset
-    
-    /*public void deleteAllFlashcards() {
-
-        db.delete(DATABASE_NAME, null, null);
-    }*/
-    
-    //---deletes a particular title---
     public boolean deleteFlashcard(long rowId) 
     {
         return db.delete(DATABASE_TABLE, KEY_ROWID + 
         		"=" + rowId, null) > 0;
     }
     
-    //---retrieves all the titles---
     public Cursor fetchAllFlashcards() 
     {
         return db.query(DATABASE_TABLE, new String[] {
@@ -121,8 +111,8 @@ public class FlashcardDb {
             mCursor.moveToFirst();
         }
         return mCursor;
-
     }
+    
     public Cursor fetchRandomFlashcard() throws SQLException {
 
         Cursor mCursor =
@@ -133,6 +123,5 @@ public class FlashcardDb {
             mCursor.moveToFirst();
         }
         return mCursor;
-
     }
 }
