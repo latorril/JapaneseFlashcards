@@ -113,6 +113,33 @@ public class FlashcardDb {
         return mCursor;
     }
     
+    public Cursor fetchNextFlashcard(long rowId) throws SQLException {
+
+        Cursor mCursor =
+            db.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
+                    KEY_QUESTION, KEY_ANSWER}, KEY_ROWID + ">" + rowId, null,
+                    null, null, null, null);
+        if (mCursor != null) {
+        	mCursor.moveToFirst();
+        }
+        else
+        {
+        	mCursor = db.query(DATABASE_TABLE, new String[] {
+            		KEY_ROWID, 
+            		KEY_QUESTION,
+            		KEY_ANSWER}, 
+                    null, 
+                    null, 
+                    null, 
+                    null, 
+                    null);
+        	if(mCursor != null){
+        		mCursor.moveToFirst();
+        	}
+        }
+        return mCursor;
+    }
+    
     public Cursor fetchRandomFlashcard() throws SQLException {
 
         Cursor mCursor =

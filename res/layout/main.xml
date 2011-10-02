@@ -38,6 +38,7 @@
 			    android:textSize="100dip"
 			    android:text="@string/question"
 			    android:background="@color/slate_gray"
+			    android:longClickable="true"
 			    />
 			<com.latorril.japanese_flashcards.AutoResizeTextView 
 				android:id="@+id/answer"
@@ -47,6 +48,7 @@
 			    android:textSize="100dip"
 			    android:text="@string/answer"
 			    android:background="@color/dark_gray"
+			    android:longClickable="true"
 			    />
 		</LinearLayout>
 	</LinearLayout>
@@ -55,18 +57,14 @@
 		android:id="@+id/slidingDrawer"
 		android:layout_width="fill_parent" 
 		android:layout_height="fill_parent"
-		android:topOffset="-55dip" 
 		android:handle="@+id/handle"
 		android:content="@+id/content"
 		android:orientation="vertical"
 		>
 		<Button
-			android:layout_width="wrap_content"
-			android:layout_height="wrap_content"
+			android:layout_width="0px"
+			android:layout_height="0px"
 			android:id="@id/handle"
-			android:text="@string/open_drawer_text"
-			android:textColor="@color/drawer_text_color"
-			android:background="@drawable/tray_handle"
 			/>
 			
 		<ScrollView

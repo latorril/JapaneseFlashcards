@@ -19,7 +19,8 @@ public class JapaneseFlashcardsActivity extends Activity{
 	FlashcardDb 
 		db;
 	long 
-		id;
+		id,
+		currentCardId;
 	String 
 		answer,
 		question;
@@ -35,9 +36,9 @@ public class JapaneseFlashcardsActivity extends Activity{
 		inflateButton;
 	SlidingDrawer 
 		slidingDrawer;
-	LayoutInflater 
+	LayoutInflater
 		myInflater;
-	LinearLayout 
+	LinearLayout
 		listGroup;
 	TextView 
 		listItemName;
@@ -58,8 +59,8 @@ public class JapaneseFlashcardsActivity extends Activity{
         nextButton        = (Button)findViewById(R.id.nextButton);
         quiz              = (View)findViewById(R.id.quiz);
         
-        closeDrawerButton = (Button)findViewById(R.id.closeDrawerButton);
         slidingDrawer     = (SlidingDrawer)findViewById(R.id.slidingDrawer);
+        closeDrawerButton = (Button)findViewById(R.id.closeDrawerButton);
         questionInput     = (EditText) findViewById(R.id.questionInput);
         answerInput       = (EditText) findViewById(R.id.answerInput);
 
@@ -71,6 +72,24 @@ public class JapaneseFlashcardsActivity extends Activity{
 		//shows first card in database
 		showFirstCard();
         
+		viewQuestion.setOnLongClickListener(new View.OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				// TODO Auto-generated method stub
+				slidingDrawer.animateOpen();
+			    return true;
+			}
+		});
+		viewAnswer.setOnLongClickListener(new View.OnLongClickListener() {
+			
+			@Override
+			public boolean onLongClick(View v) {
+				// TODO Auto-generated method stub
+				slidingDrawer.animateOpen();
+				return true;
+			}
+		});
 		nextButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -127,9 +146,25 @@ public class JapaneseFlashcardsActivity extends Activity{
 				//minimizes the flashcard list
 				listGroup.removeViewsInLayout(0, listGroup.getChildCount());
 				quiz.setVisibility(View.VISIBLE);
+				refreshDeck();
 				slidingDrawer.animateClose();
 			}
 		});
+    }
+    
+    public void refreshDeck()
+    {
+    	db.open();
+    	Cursor c = db.fetchNextFlashcard(currentCardId);
+    	if(c.moveToFirst())
+    	{
+    		setQuestion(c.getString(1), c.getString(2));
+			currentCardId = c.getLong(0);
+    	}
+		else{
+			setQuestion("0__0", "0__0");
+		}
+    	db.close();
     }
     
     public void closeIME(View v)
@@ -140,7 +175,9 @@ public class JapaneseFlashcardsActivity extends Activity{
     
     public void alertNoCards()
     {
-    	setQuestion("Add flashcards via the flashcard manager.", "What are you waiting for :)");
+    	setQuestion(
+    			"Touch here to flip this card!", 
+    			"Long touch to get to the flash card manager.");
     }
     
     public void setQuestion(String question, String answer){
@@ -154,6 +191,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 		Cursor c = db.fetchRandomFlashcard();
 		if(c.moveToFirst()){
 				setQuestion(c.getString(1), c.getString(2));
+				currentCardId = c.getLong(0);
 		}
 		else{
 			alertNoCards();
@@ -168,6 +206,7 @@ public class JapaneseFlashcardsActivity extends Activity{
         if (c.moveToFirst())
         {
         	setQuestion(c.getString(1), c.getString(2));
+			currentCardId = c.getLong(0);
         }
 		else{
 			alertNoCards();
