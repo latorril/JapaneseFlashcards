@@ -23,7 +23,6 @@
 			    android:layout_height="fill_parent"
 			    android:text="@string/next_button_text"
 			    android:textSize="20dip"
-			    android:focusable="false"
 			    />
 		</LinearLayout>
 		<LinearLayout
