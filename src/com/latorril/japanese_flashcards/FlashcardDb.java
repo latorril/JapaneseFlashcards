@@ -124,6 +124,18 @@ public class FlashcardDb {
         }
         return mCursor;
     }
+   
+    public Cursor fetchPreviousFlashcard(long rowId) throws SQLException {
+    	
+    	Cursor mCursor =
+    		db.query(true, DATABASE_TABLE, new String[] {KEY_ROWID,
+    				KEY_QUESTION, KEY_ANSWER}, KEY_ROWID + "<" + rowId, null,
+    				null, null, null, null);
+    	if (mCursor != null) {
+    		mCursor.moveToLast();
+    	}
+    	return mCursor;
+    }
     
     public Cursor fetchRandomFlashcard() throws SQLException {
 

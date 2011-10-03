@@ -17,7 +17,6 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
-import android.widget.Toast;
 import android.widget.SlidingDrawer.OnDrawerOpenListener;
 
 public class JapaneseFlashcardsActivity extends Activity implements OnClickListener{
@@ -183,8 +182,6 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
 			}
 		});
     }
-    
-
 
     class MyGestureDetector extends SimpleOnGestureListener {
         
@@ -199,16 +196,12 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
                 // right to left swipe
                 if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > 
                 SWIPE_THRESHOLD_VELOCITY) {
-                    Toast.makeText(getApplicationContext(), 
-                    		"Left Swipe", 
-                    		Toast.LENGTH_SHORT).show();
+                    showNextCard();
                 }  
                 else if (e2.getX() - e1.getX() > 
                 SWIPE_MIN_DISTANCE && Math.abs(velocityX) > 
                 SWIPE_THRESHOLD_VELOCITY) {
-                    Toast.makeText(getApplicationContext(), 
-                    		"Right Swipe", 
-                    		Toast.LENGTH_SHORT).show();
+                	showPreviousCard();
                 }
             } catch (Exception e) {
                 // nothing
@@ -302,6 +295,30 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     	db.close();
     }
     
+    public void showPreviousCard() {
+    	db.open();
+    	Cursor c = db.fetchPreviousFlashcard((Long)currentCardId);
+    	if (c.moveToLast())
+    	{
+    		setQuestion(c.getString(1), c.getString(2));
+    		currentCardId = c.getLong(0);
+    	}
+		else
+		{
+			c = db.fetchAllFlashcards();
+	        if (c.moveToLast())
+	        {
+	        	setQuestion(c.getString(1), c.getString(2));
+	        	currentCardId = c.getLong(0);
+	        }
+			else
+			{
+				alertNoCards();
+			}
+		}
+    	db.close();
+    }
+    
     public void showRandomCard() {
 		db.open();
 		Cursor c = db.fetchRandomFlashcard();
@@ -340,7 +357,7 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     public void alertNoCards() {
     	setQuestion(
     			"Touch here to flip this card!", 
-    			"Long touch to get to the flash card manager.");
+    			"Long touch to get to the flash card manager. Swipe to move through deck.");
     	currentCardId = null;
     }
 
