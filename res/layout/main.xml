@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout
 	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/mainLayout"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -22,6 +23,7 @@
 			    android:layout_height="fill_parent"
 			    android:text="@string/next_button_text"
 			    android:textSize="20dip"
+			    android:focusable="false"
 			    />
 		</LinearLayout>
 		<LinearLayout
@@ -106,6 +108,8 @@
 						android:layout_height="wrap_content"
 						android:layout_below="@id/questionText"
 						android:imeOptions="actionNext"
+						android:focusable="true"
+						
 						/>
 					<TextView
 						android:id="@+id/answerText"
@@ -120,6 +124,7 @@
 						android:layout_height="wrap_content"
 						android:layout_below="@id/answerText"
 						android:imeOptions="actionDone"
+						android:focusable="true"
 						/>
 					<Button 
 					    android:id="@+id/inflateButton"
@@ -128,12 +133,13 @@
 						android:text="Add New Card"
 						android:layout_below="@id/answerInput"
 					    android:layout_marginBottom="5dip"
+						android:focusable="true"
 					    />
 					<TextView
 						android:id="@+id/flashcardListText"
 						android:layout_width="wrap_content"
 						android:layout_height="wrap_content"
-						android:text="Flashcard List"
+						android:text="View List"
 						android:textSize="20dip"
 						android:layout_centerHorizontal="true"
 						android:layout_below="@id/inflateButton"
@@ -147,6 +153,7 @@
 						android:layout_below="@id/flashcardListText"
 						android:background="@color/dark_gray"
 						android:padding="10dip"
+						android:visibility="gone"
 						/>
 				</RelativeLayout>
 			</LinearLayout>

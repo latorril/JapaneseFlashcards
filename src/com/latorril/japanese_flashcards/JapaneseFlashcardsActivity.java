@@ -9,12 +9,13 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.SlidingDrawer;
 import android.widget.TextView;
 import android.widget.SlidingDrawer.OnDrawerOpenListener;
 
-public class JapaneseFlashcardsActivity extends Activity{
+public class JapaneseFlashcardsActivity extends Activity {
     /** Called when the activity is first created. */
 	FlashcardDb 
 		db;
@@ -36,12 +37,15 @@ public class JapaneseFlashcardsActivity extends Activity{
 		inflateButton;
 	SlidingDrawer 
 		slidingDrawer;
+	FrameLayout
+		mainLayout;
 	LayoutInflater
 		myInflater;
 	LinearLayout
 		listGroup;
 	TextView 
-		listItemName;
+		listItemName,
+		flashcardListText;
 	EditText 
 		questionInput,
 		answerInput;
@@ -53,6 +57,7 @@ public class JapaneseFlashcardsActivity extends Activity{
         
         db = new FlashcardDb(this);
         
+        mainLayout        = (FrameLayout)findViewById(R.id.mainLayout);
         flipperLayout     = (View)findViewById(R.id.card);
         viewAnswer        = (AutoResizeTextView)findViewById(R.id.answer);
         viewQuestion      = (AutoResizeTextView)findViewById(R.id.question);
@@ -61,19 +66,19 @@ public class JapaneseFlashcardsActivity extends Activity{
         
         slidingDrawer     = (SlidingDrawer)findViewById(R.id.slidingDrawer);
         closeDrawerButton = (Button)findViewById(R.id.closeDrawerButton);
-        questionInput     = (EditText) findViewById(R.id.questionInput);
-        answerInput       = (EditText) findViewById(R.id.answerInput);
+        questionInput     = (EditText)findViewById(R.id.questionInput);
+        answerInput       = (EditText)findViewById(R.id.answerInput);
 
+        flashcardListText = (TextView)findViewById(R.id.flashcardListText);
         inflateButton     = (Button)findViewById(R.id.inflateButton);
-        listGroup         = (LinearLayout) findViewById(R.id.listGroup);
-        listItemName      = (TextView) findViewById(R.id.listItemName);
-        myInflater        = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        listGroup         = (LinearLayout)findViewById(R.id.listGroup);
+        listItemName      = (TextView)findViewById(R.id.listItemName);
+        myInflater        = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
 		//shows first card in database
 		showFirstCard();
         
 		viewQuestion.setOnLongClickListener(new View.OnLongClickListener() {
-			
 			@Override
 			public boolean onLongClick(View v) {
 				// TODO Auto-generated method stub
@@ -81,6 +86,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 			    return true;
 			}
 		});
+		
 		viewAnswer.setOnLongClickListener(new View.OnLongClickListener() {
 			
 			@Override
@@ -90,6 +96,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 				return true;
 			}
 		});
+		
 		nextButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -102,7 +109,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				closeIME(v);
+				closeIME();
 	            
 	    		if((questionInput.getText().length() > 0) && 
 	    				(answerInput.getText().length() > 0))
@@ -113,11 +120,11 @@ public class JapaneseFlashcardsActivity extends Activity{
 		});
 		
         viewAnswer.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				// TODO Auto-generated method stub
-				flipCard();
-			}
+        	@Override
+        	public void onClick(View v) {
+        		// TODO Auto-generated method stub
+        		flipCard();
+        	}
         });
         
         viewQuestion.setOnClickListener(new View.OnClickListener() {
@@ -130,30 +137,78 @@ public class JapaneseFlashcardsActivity extends Activity{
         
         slidingDrawer.setOnDrawerOpenListener(new OnDrawerOpenListener() {
             @Override
-            public void onDrawerOpened() {
+            public void onDrawerOpened()
+            {
             	// TODO Auto-generated method stub
             	quiz.setVisibility(View.INVISIBLE);
-                //generates flash card list
-        		inflateFromDb();
             }
         });
         
         closeDrawerButton.setOnClickListener(new View.OnClickListener() {
 			@Override
-			public void onClick(View v) {
+			public void onClick(View v)
+			{
 				// TODO Auto-generated method stub
-				closeIME(v);
-				//minimizes the flash card list
-				listGroup.removeViewsInLayout(0, listGroup.getChildCount());
+				closeIME();
 				quiz.setVisibility(View.VISIBLE);
 				refreshDeck();
 				slidingDrawer.animateClose();
 			}
 		});
+        
+        flashcardListText.setOnClickListener(new View.OnClickListener()
+        {
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				if(!checkVisibility(listGroup))
+				{
+					setList();
+				}
+				else
+				{
+					clearList();
+				}
+			}
+		});
     }
     
-    public void refreshDeck()
-    {
+    @Override
+    protected void onPause() {
+    	closeIME();
+    }
+    
+    @Override
+    protected void onStop() {
+    	closeIME();
+    }
+    
+    public boolean checkVisibility(View v) {
+    	int state = v.getVisibility();
+    	if(state == 0)
+    	{
+    		return true;
+    	}
+    	else
+    	{
+    		return false;
+    	}
+    }
+    
+    public void clearList() {
+		listGroup.removeViewsInLayout(0, listGroup.getChildCount());
+		listGroup.setVisibility(View.GONE);
+		flashcardListText.setText("View List");
+    }
+    
+    public void setList() {
+    	clearList();
+    	listGroup.setVisibility(View.VISIBLE);
+    	flashcardListText.setText("Hide List");
+		inflateFromDb();
+    }
+    
+    public void refreshDeck() {
     	if (currentCardId == null)
     	{
     		showFirstCard();
@@ -164,8 +219,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 		}
     }
     
-    public boolean checkDeckForCard()
-    {
+    public boolean checkDeckForCard() {
     	db.open();
     	Cursor c = db.fetchFlashcard((Long)currentCardId);
     	if(c.moveToFirst())
@@ -180,8 +234,7 @@ public class JapaneseFlashcardsActivity extends Activity{
     	}
     }
     
-    public void showNextCard()
-    {
+    public void showNextCard() {
     	db.open();
     	Cursor c = db.fetchNextFlashcard((Long)currentCardId);
     	if (c.moveToFirst())
@@ -205,8 +258,7 @@ public class JapaneseFlashcardsActivity extends Activity{
     	db.close();
     }
     
-    public void showRandomCard()
-    {
+    public void showRandomCard() {
 		db.open();
 		Cursor c = db.fetchRandomFlashcard();
 		if(c.moveToFirst())
@@ -221,8 +273,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 		db.close();
     }
     
-    public void showFirstCard()
-    {
+    public void showFirstCard() {
         db.open();
         Cursor c = db.fetchAllFlashcards();
         if (c.moveToFirst())
@@ -237,34 +288,29 @@ public class JapaneseFlashcardsActivity extends Activity{
         db.close();
     }
     
-    public void setQuestion(String question, String answer)
-    {
+    public void setQuestion(String question, String answer) {
 		viewQuestion.setText(question);
 		viewAnswer.setText(answer);
     }
     
-    public void alertNoCards()
-    {
+    public void alertNoCards() {
     	setQuestion(
     			"Touch here to flip this card!", 
     			"Long touch to get to the flash card manager.");
     	currentCardId = null;
     }
 
-    public void closeIME(View v)
-    {
+    public void closeIME() {
     	InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-    	imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
+    	imm.hideSoftInputFromWindow(mainLayout.getApplicationWindowToken(), 0);
     }
     
-    public void inflateFromDb()
-    {
+    public void inflateFromDb() {
     	db.open();
         Cursor c = db.fetchAllFlashcards();
         if (c.moveToFirst())
         {
-            do
-            {
+            do {
             	inflate(c.getInt(0), c.getString(1),c.getString(2));
             }
             while (c.moveToNext());
@@ -272,8 +318,7 @@ public class JapaneseFlashcardsActivity extends Activity{
         db.close();
     }
     
-    public void inflateFromInput()
-    {
+    public void inflateFromInput() {
     	String questionString = questionInput.getText().toString();
     	String answerString   = answerInput.getText().toString();
     	db.open();
@@ -283,8 +328,7 @@ public class JapaneseFlashcardsActivity extends Activity{
     	clearInput();
     }
     
-    public void inflate(int id, String question, String answer)
-    {
+    public void inflate(int id, String question, String answer) {
     	final LinearLayout listItem = (LinearLayout) 
     	myInflater.inflate(R.layout.list_option, null);
     	listItem.setId(id);
@@ -293,11 +337,9 @@ public class JapaneseFlashcardsActivity extends Activity{
     	);
     	final Button delete;
     	delete = (Button)listItem.getChildAt(1);
-    	delete.setOnClickListener(new View.OnClickListener()
-    	{
+    	delete.setOnClickListener(new View.OnClickListener() {
     		@Override
-    		public void onClick(View v) 
-    		{
+    		public void onClick(View v) {
     			// TODO Auto-generated method stub
     			db.open();
     			db.deleteFlashcard(listItem.getId());
@@ -309,14 +351,12 @@ public class JapaneseFlashcardsActivity extends Activity{
     	listGroup.addView(listItem);
     }
     
-    public void clearInput()
-    {
+    public void clearInput() {
     	questionInput.setText(null);
     	answerInput.setText(null);
     }
     
-	public void flipCard()
-	{
+	public void flipCard() {
 		FlipAnimator animator = new FlipAnimator(viewQuestion, viewAnswer,
 				viewAnswer.getWidth() / 2, viewAnswer.getHeight() / 2, 600);
 		if (viewQuestion.getVisibility() == View.GONE)
