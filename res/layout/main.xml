@@ -137,6 +137,7 @@
 						android:textSize="20dip"
 						android:layout_centerHorizontal="true"
 						android:layout_below="@id/inflateButton"
+						android:clickable="true"
 						/>
 					<LinearLayout
 						android:id="@+id/listGroup"

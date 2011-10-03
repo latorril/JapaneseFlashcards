@@ -122,21 +122,6 @@ public class FlashcardDb {
         if (mCursor != null) {
         	mCursor.moveToFirst();
         }
-        else
-        {
-        	mCursor = db.query(DATABASE_TABLE, new String[] {
-            		KEY_ROWID, 
-            		KEY_QUESTION,
-            		KEY_ANSWER}, 
-                    null, 
-                    null, 
-                    null, 
-                    null, 
-                    null);
-        	if(mCursor != null){
-        		mCursor.moveToFirst();
-        	}
-        }
         return mCursor;
     }
     

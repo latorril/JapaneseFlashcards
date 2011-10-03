@@ -19,8 +19,8 @@ public class JapaneseFlashcardsActivity extends Activity{
 	FlashcardDb 
 		db;
 	long 
-		id,
-		currentCardId;
+		id;
+	Object currentCardId;
 	String 
 		answer,
 		question;
@@ -133,7 +133,7 @@ public class JapaneseFlashcardsActivity extends Activity{
             public void onDrawerOpened() {
             	// TODO Auto-generated method stub
             	quiz.setVisibility(View.INVISIBLE);
-                //generates flashcard list
+                //generates flash card list
         		inflateFromDb();
             }
         });
@@ -143,7 +143,7 @@ public class JapaneseFlashcardsActivity extends Activity{
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
 				closeIME(v);
-				//minimizes the flashcard list
+				//minimizes the flash card list
 				listGroup.removeViewsInLayout(0, listGroup.getChildCount());
 				quiz.setVisibility(View.VISIBLE);
 				refreshDeck();
@@ -154,46 +154,68 @@ public class JapaneseFlashcardsActivity extends Activity{
     
     public void refreshDeck()
     {
+    	if (currentCardId == null)
+    	{
+    		showFirstCard();
+    	}
+    	else if (!checkDeckForCard())
+		{
+			showNextCard();
+		}
+    }
+    
+    public boolean checkDeckForCard()
+    {
     	db.open();
-    	Cursor c = db.fetchNextFlashcard(currentCardId);
+    	Cursor c = db.fetchFlashcard((Long)currentCardId);
     	if(c.moveToFirst())
     	{
-    		setQuestion(c.getString(1), c.getString(2));
-			currentCardId = c.getLong(0);
+    		db.close();
+    		return true;
     	}
-		else{
-			setQuestion("0__0", "0__0");
+    	else
+    	{
+    		db.close();
+    		return false;
+    	}
+    }
+    
+    public void showNextCard()
+    {
+    	db.open();
+    	Cursor c = db.fetchNextFlashcard((Long)currentCardId);
+    	if (c.moveToFirst())
+    	{
+    		setQuestion(c.getString(1), c.getString(2));
+    		currentCardId = c.getLong(0);
+    	}
+		else
+		{
+			c = db.fetchAllFlashcards();
+	        if (c.moveToFirst())
+	        {
+	        	setQuestion(c.getString(1), c.getString(2));
+	        	currentCardId = c.getLong(0);
+	        }
+			else
+			{
+				alertNoCards();
+			}
 		}
     	db.close();
-    }
-    
-    public void closeIME(View v)
-    {
-		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
-    }
-    
-    public void alertNoCards()
-    {
-    	setQuestion(
-    			"Touch here to flip this card!", 
-    			"Long touch to get to the flash card manager.");
-    }
-    
-    public void setQuestion(String question, String answer){
-		viewQuestion.setText(question);
-		viewAnswer.setText(answer);
     }
     
     public void showRandomCard()
     {
 		db.open();
 		Cursor c = db.fetchRandomFlashcard();
-		if(c.moveToFirst()){
+		if(c.moveToFirst())
+		{
 				setQuestion(c.getString(1), c.getString(2));
 				currentCardId = c.getLong(0);
 		}
-		else{
+		else
+		{
 			alertNoCards();
 		}
 		db.close();
@@ -208,10 +230,31 @@ public class JapaneseFlashcardsActivity extends Activity{
         	setQuestion(c.getString(1), c.getString(2));
 			currentCardId = c.getLong(0);
         }
-		else{
+		else
+		{
 			alertNoCards();
 		}
         db.close();
+    }
+    
+    public void setQuestion(String question, String answer)
+    {
+		viewQuestion.setText(question);
+		viewAnswer.setText(answer);
+    }
+    
+    public void alertNoCards()
+    {
+    	setQuestion(
+    			"Touch here to flip this card!", 
+    			"Long touch to get to the flash card manager.");
+    	currentCardId = null;
+    }
+
+    public void closeIME(View v)
+    {
+    	InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+    	imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
     }
     
     public void inflateFromDb()
@@ -220,15 +263,17 @@ public class JapaneseFlashcardsActivity extends Activity{
         Cursor c = db.fetchAllFlashcards();
         if (c.moveToFirst())
         {
-            do {
+            do
+            {
             	inflate(c.getInt(0), c.getString(1),c.getString(2));
-            } while (c.moveToNext());
+            }
+            while (c.moveToNext());
         }
         db.close();
     }
     
-    public void inflateFromInput(){
-
+    public void inflateFromInput()
+    {
     	String questionString = questionInput.getText().toString();
     	String answerString   = answerInput.getText().toString();
     	db.open();
@@ -248,9 +293,11 @@ public class JapaneseFlashcardsActivity extends Activity{
     	);
     	final Button delete;
     	delete = (Button)listItem.getChildAt(1);
-    	delete.setOnClickListener(new View.OnClickListener() {
+    	delete.setOnClickListener(new View.OnClickListener()
+    	{
     		@Override
-    		public void onClick(View v) {
+    		public void onClick(View v) 
+    		{
     			// TODO Auto-generated method stub
     			db.open();
     			db.deleteFlashcard(listItem.getId());
@@ -268,10 +315,12 @@ public class JapaneseFlashcardsActivity extends Activity{
     	answerInput.setText(null);
     }
     
-	public void flipCard(){
+	public void flipCard()
+	{
 		FlipAnimator animator = new FlipAnimator(viewQuestion, viewAnswer,
 				viewAnswer.getWidth() / 2, viewAnswer.getHeight() / 2, 600);
-		if (viewQuestion.getVisibility() == View.GONE) {
+		if (viewQuestion.getVisibility() == View.GONE)
+		{
 			animator.reverse();
 		}
 		flipperLayout.startAnimation(animator);
