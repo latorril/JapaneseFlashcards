@@ -8,7 +8,6 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -21,44 +20,41 @@ import android.widget.SlidingDrawer.OnDrawerOpenListener;
 
 public class JapaneseFlashcardsActivity extends Activity implements OnClickListener{
     /** Called when the activity is first created. */
-	FlashcardDb 
+	static FlashcardDb 
 		db;
 	long 
 		id;
-	Object currentCardId;
+	static Object 
+		currentCardId;
 	String 
 		answer,
 		question;
-	AutoResizeTextView 
+	static MyFitText
 		viewAnswer,
 		viewQuestion;
-	View 
-		flipperLayout,
-		quiz;
+	static View 
+		flipperLayout;
+	View quiz;
 	Button 
 		nextButton, 
 		closeDrawerButton, 
 		inflateButton;
+	static Button flashcardListText;
 	SlidingDrawer 
 		slidingDrawer;
 	FrameLayout
 		mainLayout;
-	LayoutInflater
+	static LayoutInflater
 		myInflater;
-	LinearLayout
+	static LinearLayout
 		listGroup;
 	TextView 
-		listItemName,
-		flashcardListText;
+		listItemName;
 	EditText 
 		questionInput,
 		answerInput;
 	
-
-    private static final int SWIPE_MIN_DISTANCE = 50;
-    private static final int SWIPE_MAX_OFF_PATH = 300;
-    private static final int SWIPE_THRESHOLD_VELOCITY = 100;
-    private GestureDetector gestureDetector;
+    GestureDetector gestureDetector;
     View.OnTouchListener gestureListener;
 	
     @Override
@@ -81,8 +77,8 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
         
         mainLayout        = (FrameLayout)findViewById(R.id.mainLayout);
         flipperLayout     = (View)findViewById(R.id.card);
-        viewAnswer        = (AutoResizeTextView)findViewById(R.id.answer);
-        viewQuestion      = (AutoResizeTextView)findViewById(R.id.question);
+        viewAnswer        = (MyFitText)findViewById(R.id.answer);
+        viewQuestion      = (MyFitText)findViewById(R.id.question);
         nextButton        = (Button)findViewById(R.id.nextButton);
         quiz              = (View)findViewById(R.id.quiz);
         
@@ -91,7 +87,7 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
         questionInput     = (EditText)findViewById(R.id.questionInput);
         answerInput       = (EditText)findViewById(R.id.answerInput);
 
-        flashcardListText = (TextView)findViewById(R.id.flashcardListText);
+        flashcardListText = (Button)findViewById(R.id.flashcardListText);
         inflateButton     = (Button)findViewById(R.id.inflateButton);
         listGroup         = (LinearLayout)findViewById(R.id.listGroup);
         listItemName      = (TextView)findViewById(R.id.listItemName);
@@ -99,7 +95,7 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
 
 		//shows first card in database
 		showFirstCard();
-        
+		
 		viewQuestion.setOnLongClickListener(new View.OnLongClickListener() {
 			@Override
 			public boolean onLongClick(View v) {
@@ -123,7 +119,7 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
 			@Override
 			public void onClick(View v) {
 				// TODO Auto-generated method stub
-				showRandomCard();
+				showRandomCard(currentCardId);
 			}
 		});
 		
@@ -183,32 +179,6 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
 		});
     }
 
-    class MyGestureDetector extends SimpleOnGestureListener {
-        
-    	public boolean onSingleTapConfirmed(MotionEvent e){
-    		flipCard();
-			return false;
-    	}
-        public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-            try {
-                if (Math.abs(e1.getY() - e2.getY()) > SWIPE_MAX_OFF_PATH)
-                    return false;
-                // right to left swipe
-                if(e1.getX() - e2.getX() > SWIPE_MIN_DISTANCE && Math.abs(velocityX) > 
-                SWIPE_THRESHOLD_VELOCITY) {
-                    showNextCard();
-                }  
-                else if (e2.getX() - e1.getX() > 
-                SWIPE_MIN_DISTANCE && Math.abs(velocityX) > 
-                SWIPE_THRESHOLD_VELOCITY) {
-                	showPreviousCard();
-                }
-            } catch (Exception e) {
-                // nothing
-            }
-            return false;
-        }
-    }
     
     @Override
     protected void onPause() {
@@ -232,16 +202,16 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     	}
     }
     
-    public void clearList() {
+    public static void clearList() {
 		listGroup.removeViewsInLayout(0, listGroup.getChildCount());
 		listGroup.setVisibility(View.GONE);
-		flashcardListText.setText("View List");
+		flashcardListText.setText(R.string.list_closed_text);
     }
     
-    public void setList() {
+    public static void setList() {
     	clearList();
     	listGroup.setVisibility(View.VISIBLE);
-    	flashcardListText.setText("Hide List");
+    	flashcardListText.setText(R.string.list_opened_text);
 		inflateFromDb();
     }
     
@@ -271,7 +241,7 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     	}
     }
     
-    public void showNextCard() {
+    public static void showNextCard() {
     	db.open();
     	Cursor c = db.fetchNextFlashcard((Long)currentCardId);
     	if (c.moveToFirst())
@@ -295,7 +265,7 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     	db.close();
     }
     
-    public void showPreviousCard() {
+    public static void showPreviousCard() {
     	db.open();
     	Cursor c = db.fetchPreviousFlashcard((Long)currentCardId);
     	if (c.moveToLast())
@@ -319,13 +289,19 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     	db.close();
     }
     
-    public void showRandomCard() {
+    public void showRandomCard(Object lastCardId) {
 		db.open();
 		Cursor c = db.fetchRandomFlashcard();
 		if(c.moveToFirst())
 		{
+			currentCardId = c.getLong(0);
+			
+			if(lastCardId.equals(currentCardId)){
+				showNextCard();
+			}
+			else{
 				setQuestion(c.getString(1), c.getString(2));
-				currentCardId = c.getLong(0);
+			}
 		}
 		else
 		{
@@ -349,16 +325,19 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
         db.close();
     }
     
-    public void setQuestion(String question, String answer) {
+    public static void setQuestion(String question, String answer) {
 		viewQuestion.setText(question);
 		viewAnswer.setText(answer);
     }
     
-    public void alertNoCards() {
+    public static void alertNoCards() {
     	setQuestion(
     			"Touch here to flip this card!", 
-    			"Long touch to get to the flash card manager. Swipe to move through deck.");
+    			"Use swipe motion to move through the deck." 
+    			+"\n \n"+
+    			"Long touch to add and manage cards.\n ");
     	currentCardId = null;
+    	setList();
     }
 
     public void closeIME() {
@@ -366,7 +345,7 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     	imm.hideSoftInputFromWindow(mainLayout.getApplicationWindowToken(), 0);
     }
     
-    public void inflateFromDb() {
+    public static void inflateFromDb() {
     	db.open();
         Cursor c = db.fetchAllFlashcards();
         if (c.moveToFirst())
@@ -389,7 +368,7 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     	clearInput();
     }
     
-    public void inflate(int id, String question, String answer) {
+    public static void inflate(int id, String question, String answer) {
     	final LinearLayout listItem = (LinearLayout) 
     	myInflater.inflate(R.layout.list_option, null);
     	listItem.setId(id);
@@ -417,10 +396,10 @@ public class JapaneseFlashcardsActivity extends Activity implements OnClickListe
     	answerInput.setText(null);
     }
     
-	public void flipCard() {
-		FlipAnimator animator = new FlipAnimator(viewQuestion, viewAnswer,
-				viewAnswer.getWidth() / 2, viewAnswer.getHeight() / 2, 600);
-		if (viewQuestion.getVisibility() == View.GONE)
+	public static void flipCard() {
+		FlipAnimator animator = new FlipAnimator(viewAnswer, viewQuestion,
+				viewQuestion.getWidth() / 2, viewQuestion.getHeight() / 2, 600);
+		if (viewAnswer.getVisibility() == View.GONE)
 		{
 			animator.reverse();
 		}

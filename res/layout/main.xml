@@ -31,25 +31,26 @@
 		    android:layout_height="fill_parent"
 			android:layout_weight="1"
 			>
-			<com.latorril.japanese_flashcards.AutoResizeTextView
+			<com.latorril.japanese_flashcards.MyFitText
 				android:id="@+id/question"
 			    android:layout_width="fill_parent" 
 			    android:layout_height="fill_parent"
 			    android:gravity="center"
-			    android:textSize="100dip"
 			    android:text="@string/question"
 			    android:background="@color/slate_gray"
 			    android:longClickable="true"
+			    android:padding="20dip"
 			    />
-			<com.latorril.japanese_flashcards.AutoResizeTextView 
+			<com.latorril.japanese_flashcards.MyFitText
 				android:id="@+id/answer"
 			    android:layout_width="fill_parent" 
 			    android:layout_height="fill_parent"
 			    android:gravity="center"
-			    android:textSize="100dip"
 			    android:text="@string/answer"
 			    android:background="@color/dark_gray"
 			    android:longClickable="true"
+			    android:padding="20dip"
+			    android:visibility="gone"
 			    />
 		</LinearLayout>
 	</LinearLayout>
@@ -108,6 +109,7 @@
 						android:layout_below="@id/questionText"
 						android:imeOptions="actionNext"
 						android:focusable="true"
+						android:maxLength="150"
 						
 						/>
 					<TextView
@@ -124,6 +126,7 @@
 						android:layout_below="@id/answerText"
 						android:imeOptions="actionDone"
 						android:focusable="true"
+						android:maxLength="150"
 						/>
 					<Button 
 					    android:id="@+id/inflateButton"
@@ -134,15 +137,19 @@
 					    android:layout_marginBottom="5dip"
 						android:focusable="true"
 					    />
-					<TextView
+					<Button
 						android:id="@+id/flashcardListText"
-						android:layout_width="wrap_content"
+						android:layout_width="fill_parent"
 						android:layout_height="wrap_content"
-						android:text="View List"
+						android:text="@string/list_closed_text"
 						android:textSize="20dip"
 						android:layout_centerHorizontal="true"
 						android:layout_below="@id/inflateButton"
 						android:clickable="true"
+						android:layout_marginTop="10dip"
+						android:layout_marginBottom="0dip"
+						android:background="@color/slate_gray"
+						android:padding="20dip"
 						/>
 					<LinearLayout
 						android:id="@+id/listGroup"

@@ -18,7 +18,7 @@ public class FlipAnimator extends Animation {
 
     private float centerY;
 
-    private boolean forward = false;
+    private boolean forward = true;
 
     private boolean visibilitySwapped;
 
@@ -49,7 +49,7 @@ public class FlipAnimator extends Animation {
     }
 
     public void reverse() {
-        forward = true;
+        forward = false;
         View temp = toView;
         toView = fromView;
         fromView = temp;

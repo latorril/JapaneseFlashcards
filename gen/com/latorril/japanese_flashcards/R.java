@@ -10,7 +10,7 @@ package com.latorril.japanese_flashcards;
 public final class R {
     public static final class anim {
         public static final int left_in=0x7f040000;
-        public static final int left_out=0x7f040001;
+        public static final int right_in=0x7f040001;
     }
     public static final class attr {
     }
@@ -60,6 +60,8 @@ public final class R {
         public static final int answer=0x7f060002;
         public static final int app_name=0x7f060000;
         public static final int close_drawer_text=0x7f060005;
+        public static final int list_closed_text=0x7f060006;
+        public static final int list_opened_text=0x7f060007;
         public static final int next_button_text=0x7f060003;
         public static final int open_drawer_text=0x7f060004;
         public static final int question=0x7f060001;

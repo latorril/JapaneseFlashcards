@@ -6,4 +6,6 @@
     <string name="next_button_text">random card</string>
     <string name="open_drawer_text">Flashcard Manager</string>
     <string name="close_drawer_text">Done</string>
+    <string name="list_closed_text">View / Manage List</string>
+    <string name="list_opened_text">Close List</string>
 </resources>
